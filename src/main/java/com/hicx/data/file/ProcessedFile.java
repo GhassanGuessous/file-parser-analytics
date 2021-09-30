@@ -5,6 +5,8 @@ import com.hicx.data.Statistics;
 
 public class ProcessedFile extends File {
 
+    public static final ProcessedFile NONE = new ProcessedFile(null, null, null);
+
     private Statistics statistics;
 
     public ProcessedFile(String name, Extension extension, Statistics statistics) {

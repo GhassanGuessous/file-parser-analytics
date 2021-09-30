@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import com.hicx.data.Extension;
 import com.hicx.data.Statistics;
 import com.hicx.data.file.File;
 import com.hicx.data.file.ProcessedFile;
@@ -33,13 +34,16 @@ public class TextFileProcessor implements FileProcessor {
 
     @Override
     public ProcessedFile process(File sourceFile) {
-        String filePath = buildSourceFilePath(sourceFile);
-        java.io.File file = new java.io.File(filePath);
+        if (sourceFile.getExtension().equals(Extension.TXT)) {
+            String filePath = buildSourceFilePath(sourceFile);
+            java.io.File file = new java.io.File(filePath);
 
-        Statistics statistics = analyse(file);
-        moveToProcessedFolder(sourceFile);
+            Statistics statistics = analyse(file);
+            moveToProcessedFolder(sourceFile);
 
-        return new ProcessedFile(sourceFile.getName(), sourceFile.getExtension(), statistics);
+            return new ProcessedFile(sourceFile.getName(), sourceFile.getExtension(), statistics);
+        }
+        return ProcessedFile.NONE;
     }
 
     private Statistics analyse(java.io.File file) {
