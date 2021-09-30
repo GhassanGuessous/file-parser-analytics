@@ -8,10 +8,6 @@ public class DefaultPrinter implements Printer {
 
     @Override
     public void print(List<ProcessedFile> processedFiles) {
-        processedFiles.forEach(this::print);
-    }
-
-    private void print(ProcessedFile processedFile) {
-        System.out.println(processedFile.toString());
+        processedFiles.forEach(System.out::println);
     }
 }

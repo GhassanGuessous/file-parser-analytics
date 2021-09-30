@@ -18,12 +18,4 @@ public class File {
     public Extension getExtension() {
         return extension;
     }
-
-    @Override
-    public String toString() {
-        return "File{" +
-            "name='" + name + '\'' +
-            ", extension=" + extension +
-            '}';
-    }
 }
