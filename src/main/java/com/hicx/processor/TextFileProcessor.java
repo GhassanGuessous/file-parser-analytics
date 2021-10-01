@@ -29,7 +29,7 @@ public class TextFileProcessor implements FileProcessor {
 
     public TextFileProcessor(String sourceFolderPath) {
         this.sourceFolderPath = sourceFolderPath;
-        this.processedFilesFolderPath = sourceFolderPath + "/processed";
+        this.processedFilesFolderPath = sourceFolderPath + java.io.File.separator + "processed";
     }
 
     @Override
@@ -48,7 +48,7 @@ public class TextFileProcessor implements FileProcessor {
 
     private Statistics analyse(java.io.File file) {
         Map<String, Integer> wordOccurrencesMap = new HashMap<>();
-        BufferedReader bufferedReader = null;
+        BufferedReader bufferedReader;
         try {
             long wordCount = 0;
             long dotCount = 0;
@@ -57,9 +57,11 @@ public class TextFileProcessor implements FileProcessor {
 
             while ((line = bufferedReader.readLine()) != null) {
                 String[] wordsWithPunctuation = line.split(SPACE);
-                String[] wordsWithoutPunctuation = line.replaceAll(NON_LETTER_CHARACTERS_REGEX, "").toLowerCase().split(ONE_OR_MORE_SPACE_CHARACTER);
+                String[] wordsWithoutPunctuation = line.replaceAll(NON_LETTER_CHARACTERS_REGEX, "")
+                    .toLowerCase()
+                    .split(ONE_OR_MORE_SPACE_CHARACTER);
 
-                calculateWordOccurrences(wordOccurrencesMap, wordsWithoutPunctuation);
+                populateWordOccurrencesMap(wordOccurrencesMap, wordsWithoutPunctuation);
 
                 wordCount += wordsWithoutPunctuation.length;
                 dotCount += Arrays.stream(wordsWithPunctuation)
@@ -77,16 +79,10 @@ public class TextFileProcessor implements FileProcessor {
 
         } catch (IOException e) {
             return Statistics.NONE;
-        } finally {
-            try {
-                bufferedReader.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 
-    private void calculateWordOccurrences(Map<String, Integer> wordOccurrencesMap, String[] onlyWords) {
+    private void populateWordOccurrencesMap(Map<String, Integer> wordOccurrencesMap, String[] onlyWords) {
         for (String word : onlyWords) {
             if(wordOccurrencesMap.containsKey(word)) {
                 wordOccurrencesMap.put(word, wordOccurrencesMap.get(word) + 1);
@@ -115,7 +111,7 @@ public class TextFileProcessor implements FileProcessor {
 
     private String buildFilePath(File sourceFile, StringBuilder pathBuilder) {
         return pathBuilder
-                .append("/")
+                .append(java.io.File.separator)
                 .append(sourceFile.getName())
                 .append(".")
                 .append(sourceFile.getExtension().getCode())
