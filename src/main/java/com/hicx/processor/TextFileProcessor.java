@@ -19,10 +19,7 @@ import com.hicx.data.file.ProcessedFile;
 
 public class TextFileProcessor implements FileProcessor {
 
-    private static final String NON_LETTER_CHARACTERS_REGEX = "[^a-zA-Z ]";
-    private static final String ONE_OR_MORE_SPACE_CHARACTER = "\\s+";
-    private static final String WORD_END_WITH_DOT_REGEX = ".*[.]";
-    private static final String SPACE = " ";
+    private static final String NON_LETTER_CHARACTERS_REGEX = "[\\p{Punct}\\s]+";
 
     private String sourceFolderPath;
     private String processedFilesFolderPath;
@@ -39,7 +36,7 @@ public class TextFileProcessor implements FileProcessor {
             java.io.File file = new java.io.File(filePath);
 
             Statistics statistics = analyse(file);
-            moveToProcessedFolder(sourceFile);
+//            moveToProcessedFolder(sourceFile);
 
             return new ProcessedFile(sourceFile.getName(), sourceFile.getExtension(), statistics);
         }
@@ -56,17 +53,13 @@ public class TextFileProcessor implements FileProcessor {
             bufferedReader = new BufferedReader(new FileReader(file));
 
             while ((line = bufferedReader.readLine()) != null) {
-                String[] wordsWithPunctuation = line.split(SPACE);
-                String[] wordsWithoutPunctuation = line.replaceAll(NON_LETTER_CHARACTERS_REGEX, "")
-                    .toLowerCase()
-                    .split(ONE_OR_MORE_SPACE_CHARACTER);
+                String[] wordsWithoutPunctuation = line.split(NON_LETTER_CHARACTERS_REGEX);
 
                 populateWordOccurrencesMap(wordOccurrencesMap, wordsWithoutPunctuation);
 
                 wordCount += wordsWithoutPunctuation.length;
-                dotCount += Arrays.stream(wordsWithPunctuation)
-                    .filter(word -> word.matches(WORD_END_WITH_DOT_REGEX))
-                    .count();
+
+                dotCount += calculateDots(line);
             }
 
             if (wordCount == 0 || wordOccurrencesMap.isEmpty()) {
@@ -80,6 +73,16 @@ public class TextFileProcessor implements FileProcessor {
         } catch (IOException e) {
             return Statistics.NONE;
         }
+    }
+
+    private long calculateDots(String line) {
+        long dotCount = 0;
+        for (int i = 0; i < line.length(); i++) {
+            if (line.charAt(i) == '.') {
+                dotCount++;
+            }
+        }
+        return dotCount;
     }
 
     private void populateWordOccurrencesMap(Map<String, Integer> wordOccurrencesMap, String[] onlyWords) {
